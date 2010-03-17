@@ -10,7 +10,11 @@ elec = read.delim("http://hcnewsom.org/expldata/QryContestantsPC.txt", sep="\t",
 male_set = subset(elec, select=c(2,6))
 female_set = subset(elec, select=c(2,7))  
 
-#now we attach each object to the dataframe. 
+#now we attach each object to the dataframe.
+attach(male_set)
+attach(female_set)
+
+#now lets try setting this up as a pie graph
 pie_male = ggplot(male_set, aes(x=factor(1), y=male, fill=factor(male))) + geom_bar(width=1)
 
 #display our bar chart as polar coordinates.
@@ -19,10 +23,11 @@ pie_male + coord_polar(theta="y")
 pie_female = ggplot(female_set, aes(x=factor(1), y=female, fill=factor(female))) + geom_bar(width=1)
 pie_female + coord_polar(theta="y")
 
-
+#now lets try a coxcomb plot as detailed here: http://had.co.nz/ggplot2/coord_polar.html
 pie_male = ggplot(male_set, aes(x=state_name, y=male, fill=factor(male))) + geom_bar(width=1)
 pie_male + coord_polar(theta="x")
 
+#another for the female set.
 pie_female = ggplot(female_set, aes(x=state_name, y=female, fill=factor(female))) + geom_bar(width=1)
 pie_female + coord_polar(theta="x")
 
