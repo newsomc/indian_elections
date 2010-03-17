@@ -1,5 +1,5 @@
 #=============================================================
-# Analysis of Indian Election Commission of India data Using R
+# Analysis of Indian Election Commission data Using R
 # by Clint Newsom 
 # hcnewsom@gmail.com
 #=============================================================
