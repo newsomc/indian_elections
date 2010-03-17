@@ -1,3 +1,9 @@
+#=============================================================
+# Analysis of Indian Election Commission of India data Using R
+# by Clint Newsom 
+# hcnewsom@gmail.com
+#=============================================================
+
 #load the ggplot2 graphical library into our R session.
 library(ggplot2)
 
