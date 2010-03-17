@@ -26,5 +26,3 @@ pie_male + coord_polar(theta="x")
 pie_female = ggplot(female_set, aes(x=state_name, y=female, fill=factor(female))) + geom_bar(width=1)
 pie_female + coord_polar(theta="x")
 
-</br>
-
