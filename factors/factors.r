@@ -1,0 +1,64 @@
+#=========================================================================
+# Using factors
+# by Clint Newsom<br/>
+#				
+# 4/1/10<
+# hcnewsom@gmail.com
+#=========================================================================
+
+#read in data.
+elec = read.delim("http://hcnewsom.org/expldata/QryContestantsPC.txt", sep="\t", header=FALSE, col.names=c("state_code", "state_name", "pc_no", "pc_name", "schedule", "male", "female", "total", "schedule_no"))
+#add our data the the frame.
+attach(elec)
+#again, lets see what the first few lines of code look like, even though we're aldready familiar with the data. 
+head(elec)
+#lets see a summary of each column.
+summary(elec)
+#now lets do what we've been waiting for. Make a factor!
+male <- factor(male)
+#now lets see the number of levels in our new factor. This outputs 30.
+nlevels(male)
+#lets try this again using the generic levels function. This outputs a list of each level in our factor.
+#Here we get "1,2,3,4,5,6,7,8...30". Simply put, since the male column consists of integers, levels shows us a representation
+#of the occurance of each integer. 
+levels(male)
+#Try outputting the data in male to compare your output with levels.
+male
+#Now lets say we are comparing levels of male contestants in states with Lok Sabha elections. For this we'd want to make sure
+#we were using an ordered factor.
+male <- factor(male, levels=c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 32), ordered=TRUE)
+#now lets output our factor. From the levels output, i.e. "30 Levels: 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10 < 11 < 12 < 13 < ... < 32", Now we are totally
+#certain that the output is ordered. 
+male
+#now lets just check the mean.
+mean(male)
+#this gives us a warning, "In mean.default(male) : argument is not numeric or logical: returning NA"
+#we must force male into being a numeric array. lets try this again.
+mean(as.numeric(levels(male)[male]))
+#our output is 9.35543, great! We could also try this:
+mean(as.numeric(as.character(male)))
+#this gives us the same output.
+summary(elec$female)
+
+ffact = cut(elec$female, 5) 
+table(ffact)
+#we know that numbers of women fall cleanly into 6 catagories.
+ffact = cut(elec$female, pretty(elec$female, 5))
+table(ffact)
+#load ggplot2
+library(ggplot2)
+#lets plot this really quicky.
+qplot(ffact)
+#our results here are entirely expected. Let's try the same for males.
+mfact = cut(elec$male, 32)
+table(mfact)
+#there is a far greater range of men contesting seats in lok sabha elections. Lets try to split
+#themn up in to low, meadium and high. 
+mfact = cut(elec$male, 3, labels=c('low', 'medium', 'high'))
+#check out our results with a table.
+table(mfact)
+#now check it out with a quick histogram. 
+qplot(as.numeric(mfact, xlab="high, medium, low"))
+#lets play with interactions.
+newfact = interaction(elec$male, elec$female)
+qplot(as.numeric(newfact))
