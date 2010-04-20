@@ -62,6 +62,3 @@ qplot(as.numeric(mfact, xlab="high, medium, low"))
 #lets play with interactions.
 newfact = interaction(elec$male, elec$female)
 qplot(as.numeric(newfact))
-
-newfact = interaction(elec$male, elec$female, drop=TRUE)
-qplot(as.numeric(newfact))

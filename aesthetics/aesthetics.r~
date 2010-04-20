@@ -1,0 +1,5 @@
+p <- ggplot(mtcars, aes(factor(cyl), mpg))
+
+print(p + geom_boxplot(aes(fill = cyl, colour = cyl,
+size = 1.9)) + geom_point(aes(colour = mtcars$cyl)) + stat_summary(fun.y = median, geom = "crossbar",
+ymin = 0, ymax = 0, color = "grey90"))

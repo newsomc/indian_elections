@@ -1,0 +1,144 @@
+#=============================
+# Exploring Layers and Stat
+#
+# by Clint Newsom
+# 5/15/10
+#=============================
+ge = read.delim("http://hcnewsom.org/expldata/GE_2004.txt", sep="\t",header=T)
+
+# attach dataframe.
+attach(ge)
+
+# load ggplot2
+library(ggplot2)
+
+# examine our data.
+head(ge)
+
+# Here we deal with the winning candidates only.
+# We pull out first place candidates.
+#===========================================
+
+myregex <- "^1$"
+geFirst <- na.omit(ge[grep(myregex, ge$POSITION, perl=T),])
+
+g <- ggplot(geFirst)
+head(ge2)
+
+male <- geFirst[ge2$CAND_SEX == "M",]
+head(male)
+
+female <- geFirst[ge2$CAND_SEX == "F",]
+nrow(female)
+
+#============================================
+# first lets try setting up a pie that tells us how the
+# number of female winning contestants compares to the number of males.
+# Thanks to Josh Steverman for help with this.
+
+fvec <- c()
+fvec[1:45] <- "female"
+
+mvec <- c()
+mvec[1:498] <- "male"
+
+newdf <- data.frame(c(fvec, mvec))
+names(newdf) <- c("sex")
+
+df <- data.frame(variable = c("female", "male"), value=c(sum(female$TOTVOTPOLL), sum(male$TOTVOTPOLL)))
+head(df)
+
+# fig. 1
+ggplot(df, aes(x = "", y = value, fill = variable)) + geom_bar(width =1) + coord_polar(theta="y")
+ggsave("desktop/si618/homework/wk5/images/male_v_female_1st_place.png")
+
+# Could it be that female candidates are also the worst performing?
+# create a pie for 10-35th place.
+#============================
+
+summary(ge$POSITION)
+
+# we use summary to find out the highest value of
+# ge$Position-the worst a candidate can perform.
+
+myreg <- "^2[0-9]|3[0-5]$"
+geLow <- na.omit(ge[grep(myreg, ge$POSITION, perl=T),])
+head(geLow)
+
+g <- ggplot(geLow)
+head(geLow)
+
+male <- geLow[geLow$CAND_SEX == "M",]
+nrow(male)
+
+female <- geLow[geLow$CAND_SEX == "F",]
+nrow(female)
+
+# build a pie for the lower half of the spectrum
+# create a new vector for females with occurances of
+# the string equalling the number of rows found.
+fvec <- c()
+fvec[1:5] <- "female"
+
+# we do the same for males.
+mvec <- c()
+mvec[1:1224] <- "male"
+
+newdf <- data.frame(c(fvec, mvec))
+names(newdf) <- c("sex")
+
+df <- data.frame(variable = c("female", "male"), value=c(sum(female$TOTVOTPOLL), sum(male$TOTVOTPOLL)))
+head(df)
+
+# fig. 2
+ggplot(df, aes(x = "", y = value, fill = variable)) + geom_bar(width =1) + coord_polar(theta="y")
+ggsave("desktop/si618/homework/wk5/images/male_v_female_10-35_place.png")
+
+#===========================================
+# layers
+
+head(ge)
+names(ge)
+# All candidates.
+cands <- (ge[YEAR == 2004 & TOTVOTPOLL !="NA" & ST_NAME !="NA" & POSITION !="NA" & PC_NAME !="NA" & PC_NO !="NA" & MONTH !="NA" & YEAR !="NA" & CAND_NAME != "NA" & CAND_SEX != "NA" & CAND_CATEGORY !="NA" & PARTYABBRE !="NA" & TOTVOTPOLL !="NA" & POSITION !="NA" & ST_CODE !="NA",])
+summary(cands$TOTVOTPOLL)
+nrow(cands)
+
+# Total Votes polled by State.
+g <- ggplot(cands, aes(CAND_NAME, TOTVOTPOLL))
+g <- g + xlab("Candidate Category") + ylab("Total Votes Polled") + opts(title="Total Number of Votes Per Candidate by Category: 2004 Lok Sabha Elections")
+g = g +  geom_jitter(color = alpha("black", 1/5))
+ggsave("desktop/si618/homework/wk5/images/test.png")
+
+
+# Winning candidates.
+firstPlCands <- (ge[YEAR == 2004 & TOTVOTPOLL != "NA" & POSITION==1,])
+nrow(firstPlCands)  # check number of rows
+
+#g <- ggplot(cands, aes(CAND_NAME, TOTVOTPOLL, colour = CAND_SEX))
+g <- ggplot(cands, aes(CAND_NAME, TOTVOTPOLL))
+g <- g + layer(geom = "jitter")
+g %+% firstPlCands + xlab("Cand") + ylab("TOT")
+
+
+# first place candidates.
+g %+% firstPlCands + xlab("Candidate Category") + ylab("Total Votes Polled") + opts(title="Total Number of Votes Per Candidate by Category (First Place Candidates): 2004 Lok Sabha Elections")
+ggsave("desktop/si618/homework/wk5/images/first_place_candidates.png")
+
+# look at Communist party of india. 
+CPM <- (ge[YEAR == 2004 & TOTVOTPOLL != "NA" & PARTYABBRE=="CPM",])
+
+# jitter plot of cnadidates by category. 
+g <- ggplot(cands, aes(factor(ST_NAME), TOTVOTPOLL, colour=CAND_SEX))
+g <- g + geom_jitter() + opts(title="Total Votes Polled by Communist Party Candidates, shown by Sex: 2004 Indian General Elections")
+g %+% CPM + opts(axis.text.x=theme_text(size=8, angle=45, hjust=1))
+ggsave("desktop/si618/homework/wk5/images/communist_candidates.png")
+ 
+# hist INC candidates.
+INC <- (ge[YEAR == 2004 & TOTVOTPOLL != "NA" & PARTYABBRE=="INC",])
+
+g <- ggplot(cands, aes(factor(ST_NAME), TOTVOTPOLL, colour=CAND_SEX))
+g <- g + geom_jitter() + opts(title="Total Votes Polled by Indian National Congress Candidates, shown by Sex: 2004 Indian General Elections")
+g %+% INC + opts(axis.text.x=theme_text(size=8, angle=45, hjust=1))
+ggsave("desktop/si618/homework/wk5/images/inc_candidates.png")
+

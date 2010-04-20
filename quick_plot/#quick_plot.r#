@@ -25,21 +25,6 @@ ggsave("desktop/si618/homework/wk2/images/thumbs/candidate_category_sex_1_hist.p
 qplot(state_name, geom="density", xlab="State", color=candidate_sex) + opts(axis.text.x=theme_text(size=8, angle=40, hjust=1), title="Candidate Sex by State:\n 2004 State Assembly Elections", plot.title=theme_text(size=20), panel.grid.major = theme_line(size=160))
 ggsave("desktop/si618/homework/wk2/images/thumbs/candidate_category_sex_1_density.png")
 
-#candidate sex by category. fig. 2
-qplot(candidate_sex, data = elec, geom = "histogram", width=0.25, fill = candidate_category, binwidth=1, main="Candidate Sex by Category: 2004 Indian Assembly Elections") + xlab("Candidate Sex") + scale_x_discrete(candidate_sex)
-ggsave("desktop/si618/homework/wk2/images/sex_by_category_hist2.png")
-
-# candidate category by state. fig. 3
-qplot(state_name, data = elec, geom = "histogram", fill = candidate_category, binwidth=1, main="Candidate Category by State: 204 Indian Assembly Elections") + xlab("State")
-ggsave("desktop/si618/homework/wk2/images/state_cand_category_hist2.png")
-
-# separate each country into a facet. fig. 4
-qplot(candidate_category, data = elec, geom = "histogram", facets=~state_name, fill = candidate_category, main="Candidate Category by State: 2004 State Assembly Elections", binwidth=1)
-ggsave("desktop/si618/homework/wk2/images/facets_category_state.png")
-
-# candidate sex as facets. fig. 5
-qplot(candidate_sex, data = elec, geom = "histogram", facets =~state_name, binwidth=1)
-ggsave("desktop/si618/homework/wk2/images/sex_by_state.png")
 
 #===========================================================
 #===========================================================

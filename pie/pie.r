@@ -12,28 +12,51 @@ library(ggplot2)
 
 elec = read.delim("http://hcnewsom.org/expldata/QryContestantsPC.txt", sep="\t", header=FALSE, col.names=c("state_code", "state_name", "pc_no", "pc_name", "schedule", "male", "female", "total", "schedule_no"))
 
-#lets work with two specific columns for each pie we want to create. We'll create one pie showing # of male candidates per state, and another showing the # of female candidates in Lok Sabha #elections.
-male_set = subset(elec, select=c(2,6))
-female_set = subset(elec, select=c(2,7))  
+# check our data
+head(elec)
 
-#now we attach each object to the dataframe.
-attach(male_set)
-attach(female_set)
+states <- factor(elec$state_name)
+levels(states)
+nlevels(states)
+# without having to inspect the data set itself, levels() tells us all the states we need to deal with.
+# nlevels() tells us how many states we need. 
 
-#now lets try setting this up as a pie graph
-pie_male = ggplot(male_set, aes(x=factor(1), y=male, fill=factor(male))) + geom_bar(width=1)
+#lets deal with data from Uttar Pradesh alone.
+uttarPradesh <- elec[elec$state_name == "UTTAR PRADESH",]
+head(uttarPradesh)
 
-#display our bar chart as polar coordinates.
-pie_male + coord_polar(theta="y")
+nrow(uttarPradesh)
 
-pie_female = ggplot(female_set, aes(x=factor(1), y=female, fill=factor(female))) + geom_bar(width=1)
-pie_female + coord_polar(theta="y")
+percMale <- round(uttarPradesh$male / uttarPradesh$total * 100 )
+totalPercMale <- sum(signif(percMale / nrow(uttarPradesh), digits = 2))
+table(totalPercMale)
 
-#now lets try a coxcomb plot as detailed here: http://had.co.nz/ggplot2/coord_polar.html
-pie_male = ggplot(male_set, aes(x=state_name, y=male, fill=factor(male))) + geom_bar(width=1)
-pie_male + coord_polar(theta="x")
+percFemale <- round(uttarPradesh$female / uttarPradesh$total * 100)
+table(percFemale)
 
-#another for the female set.
-pie_female = ggplot(female_set, aes(x=state_name, y=female, fill=factor(female))) + geom_bar(width=1)
-pie_female + coord_polar(theta="x")
+totalPercFemale <- sum(signif(percFemale / nrow(uttarPradesh), digits = 2))
+table(totalPercFemale)
+
+sex <- c(totalPercFemale, totalPercMale)
+sex_labels <- paste(sex, "%", sep="")
+pie(sex, main="Sex", col=rainbow(length(sex)),labels=c(sex_labels))
+
+
+
+
+males <- c(uttarPradesh$male)
+females <- c(uttarPradesh$female)
+
+sort(males)
+sort(females)
+
+(pie <- ggplot(uttarPradesh, aes(x = factor(1), fill = factor(females))) + geom_bar(width = 1))
+pie + coord_polar(theta="y")
+ggsave("images/uttar_female_candidates.png")
+
+pie = ggplot(uttarPradesh, aes(x=factor(1), fill=factor(males))) + geom_bar(width=1)
+pie + coord_polar(theta="y")
+ggsave("images/uttar_male_candidates.png")
+
+
 

@@ -1,0 +1,70 @@
+#==================================================
+# Mapping Female Electors: 2004 General Elections 
+#
+# by Clint Newsom
+# 4/20/2010
+# hncewsom@gmail.com
+#==================================================
+
+# load ggplot2
+library(ggplot2)
+# load maptools
+library(maptools)
+
+# read in our shapefile containing state boundaries.
+india <- readShapeSpatial("desktop/si618/indian_elections/regex_layers/shps/india_st.shp")
+
+# read in electors data
+electors <- read.delim("desktop/si618/data/nohead.txt", sep="\t", header=FALSE, col.names=c("STATE_CODE", "STATE", "PC_NO", "PC_NAME", "PCElectorsMale", "PCElectorsFemale", "ElectorsTotal",  "VoterTurnoutMale.age", "VoterTurnoutFemale.age", "VoterTurnoutPC"))
+head(electors)
+
+# check all of our data.
+head(india)
+head(electors)
+summary(india)
+names(india)
+
+# create a new data.frame to manage x,y positions.
+# Thanks again to Josh Steverman for doing some intense Googling to
+# discover this method. Following code follows his tutorial. 
+lp <- data.frame(do.call(rbind, lapply(india@polygons, function(x) x@labpt)))
+names(lp) <- c("x","y")
+india@data <- data.frame(india@data, lp)
+head(india@data)
+
+# This is a file provided by Hadley Wickham, which 
+source("desktop/si618/exercises/wk6/fortify.r")
+ind <- fortify(india)
+
+# merge our two files together
+states <- merge(ind, electors, by.x="id", by.y="STATE")
+head(states)
+# start mapping!
+p <- ggplot(states)
+
+p + aes(long, lat, group=group, width=".1", size=states$PCElectorsFemale) + geom_path()
+ggsave("desktop/si618/indian_elections/regex_layers/shps/images/test.png")
+
+#test
+p + aes(long, lat, width=".01", group=states$PCElectorsFemale, fill=c(states$STATES, states$PCElectorsFemale)) + geom_polygon() + coord_map(projection="lagrange")
+ggsave("desktop/si618/indian_elections/regex_layers/shps/images/test_using_groups.png")
+
+# A quick test to see where we stand with our maps. 
+p + aes(long, lat, width=".01", group=group, fill=c(states$STATES, states$PCElectorsFemale)) + geom_polygon() + coord_map(projection="lagrange")
+
+# Not incredibly satisfying. We obviously need a better shapefile. GIS data for India is surprisingly hard to come by.
+p + aes(long, lat, group=states$PCElectorsFemale, width=".01", color="black", fill=states$PCElectorsFemale) + geom_polygon() + coord_map(project="lagrange") + opts(title="Number of Female Electors Per State: 2004 Indian General Elections")
+ggsave("desktop/si618/indian_elections/regex_layers/shps/images/first.png")
+
+p + aes(long, lat, group=group, width=".01", color="black", fill=states$VoterTurnoutFemale.age) + geom_polygon() + coord_map(project="lagrange") + opts(title="Percent Female Voter Turnout: 2004 Indian General Elections")
+ggsave("desktop/si618/indian_elections/regex_layers/shps/images/second.png")
+
+
+# try calculating the percentage of total Female Electors manually. 
+states$percentFemOfTot <- states$PCElectorsFemale / states$ElectorsTotal *100
+p + aes(long, lat, group=group, width=".01", color="black", fill=states$percentFemOfTot) + geom_polygon() + coord_map(project="lagrange") + opts(title="Percent Female Electors: 2004 Indian General Electinos")
+ggsave("desktop/si618/indian_elections/regex_layers/shps/images/third.png")
+
+
+
+
